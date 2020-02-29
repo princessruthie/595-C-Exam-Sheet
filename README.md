@@ -6,7 +6,7 @@
 - 2<sup>10</sup> = kilo, 2<sup>20</sup> = mega, 2<sup>30</sup> = giga
 - each process has its own page table that maps virtual page to physical frame
 - VM/#pages = PM/#frames = page size = frame size
-- Virtual address is split into log(#pages) bits and log(page size) bits
+- Virtual address is split into log(#pages) bits and log(page_size/addressability) bits
 
 ## LL implementation
 
