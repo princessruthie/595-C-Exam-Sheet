@@ -26,6 +26,23 @@
   - A = &x //no can do. A not a var therefore cannot assign like this
 - TODO. Draw the diagram of program text, heap, stack
 
+## Structs and Data Structures
+```
+typedef struct Witch witch;     //makes the shortcut
+typedef struct Animal animal;
+struct Witch {
+  char* name;
+  animal* familiar;
+};
+struct Animal {
+  char species[100];
+}
+```
+- You can use dot `.` operator on a proper struct or `->` on a pointer to a struct
+  - `witch* w = malloc(sizeof(witch));`
+  - `w->familiar = a;`//a defined, initialized
+  - `(*w).familiar = a;`
+
 ## Intialization
 - TODO: lecture #3 material
 
@@ -52,3 +69,4 @@
 - Using an uninitialized var is grabbing a random cup and drinking from it while hoping for a milkshake
 - When dealing with hex, carefully consider RtoL or LtoR
 - strcmp returns 0 if it's a match
+- strcpy(to, from, max_num_non_null_characters);
