@@ -29,6 +29,26 @@
 ## Intialization
 - TODO: lecture #3 material
 
-## threads, locking, trylock
+## Threads, Locking, Trylock
+- `void* threadable_fun(void* p){...}`
+- `pthread t`;
+- `pthread_create(&t, <config>, &threadable_fun, &param);`
+  - returns 0 on success
+- can omit & on &threadable
+- `void* r`;
+- `pthread_join(t, <pter to t's entry pt/return value>);`
+  - example: pthread_join(t, &r);
+  - returns 0 on success
+- now recast r for usage
+  - `int r_int = \*(int*)r`;
+  - must cast then deref b/c you can't deref a void*
+- TODO locking and trylock
 
 ## fn pt'er syntax
+
+## Gotchas
+- Make sure you draw the stack going the right direction
+- `if(x || b == NULL)` should be `if(a == NULL || b == NULL)`
+- Using an uninitialized var is grabbing a random cup and drinking from it while hoping for a milkshake
+- When dealing with hex, carefully consider RtoL or LtoR
+- strcmp returns 0 if it's a match
