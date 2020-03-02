@@ -14,7 +14,7 @@
 typedef struct Node node;
 struct Node {
 	int data;
-	node* next;
+	node* next; //without typedef above, would need struct Node* next
 };
 
 //adding an element to the linked list at the head
@@ -33,11 +33,53 @@ int add_to_front(int value, node** head) {
 	*head = new;
 	return 0; //this means success, by convention
 }
+
+int contains(int val, node* h){
+  node* head = h; //since h is a copy of pt'er, don't need this
+  while(head != NULL){
+    if(head->data == val) return 1;
+    head = head->next;
+  }
+  return 0;
+}
+
 int fun() {
 	node* h = NULL;
 	add_to_front(8, &h); //the address of h is a node ptr ptr
 }
 ```
+
+## Generic LL
+```
+typedef struct Node node;
+struct Node {
+  void* data; //void* is a variable that holds address of "something"
+  node* next;
+};
+
+int contains(void* val, node* head, int (*compare)(void*, void*)){
+  while(head != NULL){
+    if(compare(val, head->data) == 0) return 1;
+    head = head->next;
+  }
+  return 0;
+}
+
+int str_compare(void* a, void* b){
+  char* ac = (char*) a;
+  char* bc = (char*) b;
+  return strcmp(ac, bc);
+}
+
+...
+
+node* head = ...
+add_to_front...
+char* name = "dog";
+if(contains(name, head, &str_compare)) printf("puppy!");
+```
+
+- int (*funp) (int); //declares a pter, funp to function that takes an int (second int) and returns an int (first int)
 
 ## Array reviews
 - char msg[] = "Exams are fun!";
