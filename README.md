@@ -119,7 +119,7 @@ struct Animal {
 
 ## Threads, Locking, Trylock
 - `void* threadable_fun(void* p){...}`
-- `pthread t`;
+- `pthread_t t`;
 - `pthread_create(&t, <config>, &threadable_fun, &param);`
   - returns 0 on success
 - can omit & on &threadable
