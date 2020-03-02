@@ -9,6 +9,35 @@
 - Virtual address is split into log(#pages) bits and log(page_size/addressability) bits
 
 ## LL implementation
+``` c 
+
+typedef struct Node node;
+struct Node {
+	int data;
+	node* next;
+};
+
+//adding an element to the linked list at the head
+//1. Create the new node
+//2. Point the new node's next to the current head node
+//3. Point the "head node pointer" to the new node
+
+//function to add a node to the head follows
+//have to pass in the pointer to a pointer, because we are needing to change head in a pass-by-reference fashion
+
+int add_to_front(int value, node** head) {
+	node* new = malloc(sizeof(node));
+	if(new == NULL) return 1;
+	new->data = value;
+	new->next = *head;
+	*head = new;
+	return 0; //this means success, by convention
+}
+int fun() {
+	node* h = NULL;
+	add_to_front(8, &h); //the address of h is a node ptr ptr
+}
+```
 
 ## Array reviews
 - char msg[] = "Exams are fun!";
@@ -59,9 +88,65 @@ struct Animal {
 - now recast r for usage
   - `int r_int = \*(int*)r`;
   - must cast then deref b/c you can't deref a void*
-- TODO locking and trylock
+``` c
+LOCKS AND TRYLOCK
+//global var x
+int x = 0;
+//also a global var. a struct of type mutex_t named lock. 
+//defined in the <pthread.h> library. the struct is global.
+//not yet initialized but we will need to
+pthread_mutex_t lock, lock2;
 
+//first entry point
+void* fun5 (void* p) {
+	//pass our lock to a function called lock
+	//attempt to aquire the lock 
+	//wait here if another thread holds it (goto sleep here)
+	pthread_mutex_lock(&lock);
+	//once lock is aquired, we can update the var x. 
+	//this is our critical section (where race could occur)
+	x += 8;
+//once done with critical section, must unlock
+	pthread_mutex_unlock(&lock);
+}
+//global var k
+int k = 0;
+void* fun6(void* p) {
+	pthread_mutex_lock(&lock);
+	x += 4;
+	pthread_mutex_unlock(&lock);
+}
+
+void* fun7(void* p) {
+	//we shouldn't use the same lock (lock) for this
+ 	//because no chance of race condition - two different global vars are being manipulated. 
+// so use lock2
+	pthread_mutex_lock(&lock2);
+	k += 3;
+	pthread_mutex_unlock(&lock2);
+}
+//we need to initialize the locks before starting the threads
+main() {
+	//pass lock to be initialized
+	//pass NULL as the config param, we can use default
+	pthread_mutex_init(&lock, NULL);
+	pthread_mutex_init(&lock2, NULL);
+}
+//returns 0 and acquires lock if available.
+//returns non-zero and proceeds if not available.
+pthread_mutex_trylock(&lock);
+```
 ## fn pt'er syntax
+``` c
+int (*funp)(int);
+/**this is declaring a pointer which is named funp to a function that takes an int as a parameter and returns an int. 
+```
+
+## Scheduling
+* *Non-Preemptive*: if a process is running, it continues to run until it completes or until it gives up the CPU. So it won’t be interrupted, though it may have to wait for some resource and thereby go from 
+running -> blocked -> ready -> back to running. 
+
+* *Preemptive*: the Scheduler may interrupt after a certain amount of time and/or if some other process becomes ready.
 
 ## Gotchas
 - Make sure you draw the stack going the right direction
@@ -69,4 +154,5 @@ struct Animal {
 - Using an uninitialized var is grabbing a random cup and drinking from it while hoping for a milkshake
 - When dealing with hex, carefully consider RtoL or LtoR
 - strcmp returns 0 if it's a match
-- strcpy(to, from, max_num_non_null_characters);
+- strncpy(to, from, max_num_non_null_characters);
+
