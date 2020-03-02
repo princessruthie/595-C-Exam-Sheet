@@ -189,6 +189,13 @@ int (*funp)(int);
 running -> blocked -> ready -> back to running. 
 
 * *Preemptive*: the Scheduler may interrupt after a certain amount of time and/or if some other process becomes ready.
+- response_time = start - arrival
+- turnaround = finish - arrival
+- waiting time = turnaround - execution = how long in ready/blocked state
+- a process is one or more threads
+- a thread is a schedulable unit, also called lightweight process
+- threads in a single process all share one process ID but have separate Program Counter, Frame Pointer, Stack Pointer, priority, NZP registers
+- PCB process control block is a DS in memory for OS that tracks ready and waiting processes
 
 ## Gotchas
 - Make sure you draw the stack going the right direction
