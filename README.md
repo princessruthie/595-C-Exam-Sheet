@@ -8,8 +8,26 @@
 - VM/#pages = PM/#frames = page size = frame size
 - Virtual address is split into log(#pages) bits and log(page_size/addressability) bits
 
+full example:
+Consider a system with:
+
+32 bit address space, byte addressable, 1GB physical memory, 2^18 entries in page table.
+
+32 bit address space means 2^32 addresses
+byte addressable means 2^32 theoretically possible bytes ( VM size)
+
+Size in bytes of each page = 2^32 / 2^18 = 2^14
+
+so 2^4 times 2^10 = 16 * 1KB
+
+How many frames? Frame size == page size, so frames are also 2^14
+
+1GB physical mem = 2^30
+
+2^30 / 2^14 = 2^16 frames in physical memory
+
 ## LL implementation
-``` c 
+``` c
 
 typedef struct Node node;
 struct Node {
@@ -50,7 +68,7 @@ int fun() {
 ```
 
 ## Generic LL
-```
+``` c
 typedef struct Node node;
 struct Node {
   void* data; //void* is a variable that holds address of "something"
@@ -79,7 +97,13 @@ char* name = "dog";
 if(contains(name, head, &str_compare)) printf("puppy!");
 ```
 
-- int (*funp) (int); //declares a pter, funp to function that takes an int (second int) and returns an int (first int)
+``` c
+//function pointer syntax:
+int (*funp) (int);
+
+//declares a pter funp to function that takes an int (second int) and returns an int (first int)
+
+```
 
 ## Array reviews
 - char msg[] = "Exams are fun!";
@@ -113,6 +137,7 @@ struct Animal {
   - `witch* w = malloc(sizeof(witch));`
   - `w->familiar = a;`//a defined, initialized
   - `(*w).familiar = a;`
+  - they key here is that the arrow notation is used when you are working with a ptr to a struct, the dot notation when you are using the struct var itself. so you can do something like `(*w).familiar = a ` because you are dereferencing the struct ptr first.
 
 ## Intialization
 - TODO: lecture #3 material
@@ -128,13 +153,13 @@ struct Animal {
   - example: pthread_join(t, &r);
   - returns 0 on success
 - now recast r for usage
-  - `int r_int = \*(int*)r`;
+  - `int r_int = *(int*)r`;
   - must cast then deref b/c you can't deref a void*
 ``` c
 LOCKS AND TRYLOCK
 //global var x
 int x = 0;
-//also a global var. a struct of type mutex_t named lock. 
+//also a global var. a struct of type mutex_t named lock.
 //defined in the <pthread.h> library. the struct is global.
 //not yet initialized but we will need to
 pthread_mutex_t lock, lock2;
@@ -142,10 +167,10 @@ pthread_mutex_t lock, lock2;
 //first entry point
 void* fun5 (void* p) {
 	//pass our lock to a function called lock
-	//attempt to aquire the lock 
+	//attempt to aquire the lock
 	//wait here if another thread holds it (goto sleep here)
 	pthread_mutex_lock(&lock);
-	//once lock is aquired, we can update the var x. 
+	//once lock is aquired, we can update the var x.
 	//this is our critical section (where race could occur)
 	x += 8;
 //once done with critical section, must unlock
@@ -161,7 +186,7 @@ void* fun6(void* p) {
 
 void* fun7(void* p) {
 	//we shouldn't use the same lock (lock) for this
- 	//because no chance of race condition - two different global vars are being manipulated. 
+ 	//because no chance of race condition - two different global vars are being manipulated.
 // so use lock2
 	pthread_mutex_lock(&lock2);
 	k += 3;
@@ -181,14 +206,14 @@ pthread_mutex_trylock(&lock);
 ## fn pt'er syntax
 ``` c
 int (*funp)(int);
-/**this is declaring a pointer which is named funp to a function that takes an int as a parameter and returns an int. 
+/**this is declaring a pointer which is named funp to a function that takes an int as a parameter and returns an int.
 ```
 
 ## Scheduling
-* *Non-Preemptive*: if a process is running, it continues to run until it completes or until it gives up the CPU. So it won’t be interrupted, though it may have to wait for some resource and thereby go from 
-running -> blocked -> ready -> back to running. 
-
+* *Non-Preemptive*: if a process is running, it continues to run until it completes or until it gives up the CPU. So it won’t be interrupted, though it may have to wait for some resource and thereby go from
+running -> blocked -> ready -> back to running.
 * *Preemptive*: the Scheduler may interrupt after a certain amount of time and/or if some other process becomes ready.
+
 - response_time = start - arrival
 - turnaround = finish - arrival
 - waiting time = turnaround - execution = how long in ready/blocked state
@@ -197,11 +222,19 @@ running -> blocked -> ready -> back to running.
 - threads in a single process all share one process ID but have separate Program Counter, Frame Pointer, Stack Pointer, priority, NZP registers
 - PCB process control block is a DS in memory for OS that tracks ready and waiting processes
 
-## Gotchas
+## Gotchas and Misc
 - Make sure you draw the stack going the right direction
 - `if(x || b == NULL)` should be `if(a == NULL || b == NULL)`
 - Using an uninitialized var is grabbing a random cup and drinking from it while hoping for a milkshake
 - When dealing with hex, carefully consider RtoL or LtoR
 - strcmp returns 0 if it's a match
 - strncpy(to, from, max_num_non_null_characters);
-
+- deadlock can't happen if you're only using one lock (eddiemurphy_pointingtohead.gif)
+- malloc syntax example:
+``` c
+ pthread_t *threads = malloc(sizeof(pthread_t)*N)
+  ```
+  - remember if passing an array to a function to do stuff at run time, you have to also pass in the size of the array you wish to work with because you can't determine an array size in C just by looking at each element.
+  - remember that when drawing symbol table, params start at FP+4 and are on the stack in increasing address, global vars aren't on the local symbol table
+  - round robin scheduling = each process gets the same fixed amount of time on cpu
+	- threads in the same process share the same heap
